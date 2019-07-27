@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>详情页</title>
+	<style>
+		* {
+			margin: 0;
+			padding: 0;
+			font-family:"楷体"
+		}
+
+		ul, li {
+			margin: 0;
+			padding: 0;
+			list-style: none;
+		}
+		a {
+			cursor:pointer;
+		}
+
+		.daohang {
+			width: 1325px;
+			height: 96px;
+			background-color: black;
+			margin-left: 18px;
+			border-radius: 20px;
+			margin-top: 10px;
+			position: relative;
+		}
+
+		.left-daohang li:first-child, .left-daohang li:nth-child(2){
+			float: left;
+			border-right: 1px solid gray;
+			height: 96px;
+		}
+
+		.left-daohang a {
+			font-size: 30px;
+			line-height: 96px;
+			text-align: center;
+			margin: 0 20px;
+			color: white;
+		}
+
+		.right-daohang {
+			position: absolute;
+			right: 20px;
+			top: 0px;
+		}
+
+		.right-daohang li {
+			float: left;
+			color: white;
+		}
+
+		.right-daohang li {
+			margin: 0 5px;
+			font-size: 30px;
+			line-height: 96px;
+			text-align: center;
+		}
+		
+		.center-body {
+			width: 1325px;
+			height: 450px;
+			background-color: black;
+			margin: 0 auto;
+			margin-top: 40px;
+			margin-left: 15px;
+			border: 1px solid black;
+			border-top-left-radius: 20px;
+			border-top-right-radius: 20px;
+		}
+		
+		.content {
+			height: 384px;
+			margin-top: 30px;
+		}
+
+		.left-centent {
+			padding: 20px;
+		}
+
+		.left-centent tr td:first-child, .center-centent tr td:first-child {
+			background-color: 	#a19d9d;
+		}
+
+		.left-centent tr td:nth-child(2), .center-centent tr td:nth-child(2) {
+			background-color: 	#59493f;
+		}
+
+		.left-centent td, .center-centent td{
+			padding: 5px;
+			width: 150px;
+			height: 30px;
+			font-size: 20px;
+		}
+
+		.center-centent {
+			position: relative;
+			top: -132px;
+		}
+
+		
+
+	    body {
+	    	background: url('img/timg.jpg');
+	    }
+
+
+	</style>
+</head>
+<body>
+	<div class="headers">
+		<!-- 导航栏 -->
+		<div class="daohang">
+			<ul class="left-daohang">
+				<li><a>首页</a></li>
+				<li><a>商城</a></li>
+				<li><a>Go!Game.</a></li>
+			</ul>
+			<ul class="right-daohang">
+				<li><a>登录</a></li>
+				<li><span>|</span></li>
+				<li><a>注册</a></li>
+				<li><input type="text" style="position: relative; bottom: 5px; width: 150px; border-radius: 5px; height: 30px; font-size: 15px; text-align: center;" placeholder="搜索"></li>
+				<li><input type=button style="position: relative; bottom: 4px;background:white; width: 60px; height: 30px; border-radius: 5px;" value="搜素"></li>
+			</ul>
+		</div>
+
+		<!-- 中间层内容-->
+		<div class="center-body">
+			<div class="content">
+				<table>
+					<tbody>
+						<td class='left-centent'>
+							<table>
+								<tbody>
+									<tr>
+										<td><span>名称</span></td>
+										<td>青眼白龙</td>
+									</tr>
+									<tr>
+										<td><span>卡片种类</span></td>
+										<td></td>
+									</tr>
+									<tr>
+										<td><span>种族</span></td>
+										<td></td>
+									</tr>
+									<tr>
+										<td><span>属性</span></td>
+										<td></td>
+									</tr>
+									<tr>
+										<td><span>星级</span></td>
+										<td></td>
+									</tr>
+									<tr>
+										<td><span>攻击力</span></td>
+										<td></td>
+									</tr>
+									<tr>
+										<td><span>防御力</span></td>
+										<td></td>
+									</tr>
+								</tbody>
+							</table>
+						</td>
+						<td class="center-centent">
+							<table style="position: fixed; top: 200px">
+								<tbody>
+									<tr>
+										<td style="position: fixed; top:202px"><span style="position: fixed; top:210px">效果</span></td>
+										<td style="position: relative; left: 160px; width: 300px">
+											卡片
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</td>
+						<td style="position: relative; left:600px"><img src="img/1190.jpg" style="width: 300px; height: 300px;" alt=""></td>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

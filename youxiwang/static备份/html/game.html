@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>游戏王</title>
+	<script src="js/jquery.min.js"></script>
+	<script src="js/socket.io.js"></script>
+	<style>
+		* {
+			margin: 0;
+		}
+
+		button {
+			opacity: 0.8;
+			background-color: #FF4500;
+			border: 0px;
+		}
+
+		.headers {
+			position: relative;
+			width: 1346px;
+			height: 637px;
+			background: url("img/bg.jpg");
+			padding: 10px;
+		}
+
+		/*左边框*/
+		.left-border {
+			width: 490px;
+			position: absolute;
+		}
+
+
+		/*图片显示*/
+		.card-view {
+			width: 350px;
+			height: 282px;
+			margin-right: 10px;
+			float: left;
+		}
+
+		/*投降*/
+		.over {
+			width: 130px;
+			height: 70px;
+			float: left;
+		}
+
+		/*左下框*/
+		.left-bottom {
+			height: 297px;
+			margin-top: 10px;
+			background-color: #DCDCDC;
+		}
+
+
+
+		/*右边框*/
+		.right-border {
+			position: absolute;
+			border: 1px solid green;
+			left: 500px;
+			width: 812px;
+		}
+
+		/*右上边框*/
+		.right-top {
+			height: 70px;
+			width: 820px;
+			overflow: hidden;
+		}
+
+		/*左血条*/
+		.left-blood {
+			width: 338px;
+			float: left;
+			background-color: red;
+		}
+
+		/*回合*/
+		.round {
+			margin: 0px 34px;
+			width: 68px;
+			float: left;
+			background-color: yellow;
+		}
+
+		/*右血条*/
+		.right-blood {
+			width: 338px;
+			background-color: red;
+			float: left;
+		}
+
+		/*右下边框*/
+		.right-bottom {
+			margin-top: 17px;
+			height: 502px;
+		}
+
+		/* 左卡组 */
+		.left-card {
+			width: 68px;
+			float: left;
+		}
+
+		/* 中间卡牌 */
+		.center-card {
+			width: 550px;
+			float: left;
+			margin: 0 63px;
+		}
+
+		/* 右卡组 */
+		.right-card {
+			width: 68px;
+			float: left;
+		}
+
+		/*左边我方卡组*/
+		.left-me-card {
+			margin-top: 65px;
+		}
+		
+		/*左边卡组图片属性设置*/
+		.left-card img {
+			width: 80%;
+		}
+
+		/*左边卡组图片属性设置*/
+		.left-card {
+		 	text-align: center;
+		}
+
+		/*右边我方卡组*/
+		.right-me-card {
+			margin-top: 70px;
+		}
+		
+		/*右边卡组图片属性设置*/
+		.right-card img {
+			width: 80%;
+		}
+
+		/*右边卡组图片属性设置*/
+		.right-card {
+		 	text-align: center;
+		}
+
+		/*场地卡牌居中*/
+		.center-card div {
+			text-align: center;
+			border: 1px solid blue;			
+		}
+
+		/*场地卡片大小*/
+		.area div div{
+		 	display:inline-block;
+			cursor:pointer;
+			width: 102px;
+		 	line-height:0;
+			border: 1px solid red;
+			vertical-align:middle;
+		}
+		.area div img {
+			margin-top: 3px;
+			width: 80%;
+			height: 90%;
+			vertical-align:bottom;
+			position: relative;
+		}
+
+		/*敌方/我方手卡*/
+		.you_hand a, .my_hand a {
+		 	display:inline;
+		}
+		
+		/*手牌不换行*/
+		.my_hand {
+			white-space:nowrap; 
+			overflow: scroll;
+		}
+		
+		/*css3去除滚动条*/
+		::-webkit-scrollbar {
+			width: 0px;
+		}
+
+		::-webkit-scrollbar-track {
+			background-color: none;
+		}
+
+		::-webkit-scrollbar-thumb {
+			background-color: none;
+		}
+
+		::-webkit-scrollbar-thumb:hover {
+			background-color: none;
+		}
+
+		::-webkit-scrollbar-thumb:active {
+			background-color: none;
+		}
+
+		
+		/*敌方/我方卡牌大小*/
+		.you_hand a img, .my_hand a img {
+			width: 68px;
+		}
+		
+		/*左视图图片大小*/
+		.card-view img {
+			width: 100%;
+			height: 100%;
+		}
+
+		/*清除浮动*/
+		.clear{ clear:both}
+
+		/*给所有a标签添加手型*/
+		a {
+			cursor:pointer;
+			text-decoration:none;
+		}
+
+
+	</style>
+
+	<script>
+
+		var a = true; // 手牌判断参数
+		var t = []; // 存放手卡的对象
+		i = 1; // 用来判断手卡
+
+		// 手卡点击上浮
+		function card (t) {
+			var is_card = t.attr('name');
+			if (is_card == 'mofa' || is_card == 'xianjing') {
+				if (a == true) {
+					t.css("top", -10);
+					t.find("button[name='fz']").fadeIn();
+				} else {
+					t.css("top", 0);
+					t.find("button[name='fz']").hide();
+				}
+				a = !a;
+			} else {
+				if (a == true) {
+					t.css("top", -10);
+					t.find("button[name='zh']").fadeIn();
+					t.find("button[name='fz']").fadeIn();
+				} else {
+					t.css("top", 0);
+					t.find("button[name='zh']").hide();
+					t.find("button[name='fz']").hide();
+				}
+				a = !a;
+			}
+		}
+
+
+
+		$(document).ready(function () {
+
+
+			var card_dict = {
+				"btm1": "top10",
+				"btm2": "top9",
+				"btm3": "top8",
+				"btm4": "top7",
+				"btm5": "top6",
+				"btm6": "top5",
+				"btm7": "top4",
+				"btm8": "top3",
+				"btm9": "top2",
+				"btm10": "top1",
+				"m1": "y5",
+				"m2": "y4",
+				"m3": "y3",
+				"m4": "y2",
+				"m5": "y1",
+			}
+
+			var url = "http://" + document.domain + ":" + location.port;
+			var io_client = io.connect(url);
+			io_client.on("connect", function () {
+				// 连接成功事件
+				console.log('连接成功');
+			});
+
+
+			// 点击手牌向上偏移
+			$(".my_hand").on('click', 'a', function(){
+				if(i == 1) {
+					t.unshift($(this))
+				}
+				i++;
+				var g = t.pop();
+				t.unshift($(this));
+				if (g.is($(this))) {	// 如果点击的牌是上一次点击的牌就执行
+					card(g);	
+				} else if (!g.is($(this)) && a == false) {	// 如果点击的牌不是上一次点击的牌并且a=false就执行
+					card(g);
+					card($(this));
+				} else {	// 如果点击的牌不是上一次点击的牌并且a=true就执行
+					card($(this));
+				}
+			});
+
+			// 解绑怪兽区域
+			function unbind_guaishou() {
+				$("#me-guaishou div").css("border", "1px solid red");
+				$("#me-guaishou div").css("cursor", "pointer");
+				$("#me-guaishou div").unbind("click");
+			}
+
+			// 解绑放置区域
+			function unbind_fangzhi() {
+				$("#me-fangzhi div").css("border", "1px solid red");
+				$("#me-fangzhi div").css("cursor", "pointer");
+				$("#me-fangzhi div").unbind("click");
+			}
+
+			// 判断区域有没有存在卡牌，有卡牌的区域不加边框
+			function is_card_area_border (id_img) {
+				$(id_img).each(function () {
+					var img_url = $(this).attr("src");
+					if (img_url == "") {
+						$(this).parent().css("border", "1px dashed red");
+						$(this).parent().css("cursor", "Default");
+					} 
+				});
+			}	
+
+			// 判断区域有没有存在卡牌，有卡牌的区域不能选
+			function is_card_area_no_choose (is_name) {
+				// 魔法陷阱放置
+				if (is_name == "fangzhi") {
+					$("#me-fangzhi div").click(function () {
+						if($(this).children('img').attr("src") == "") {
+							fz.next().attr('src', '');
+							$(this).children('img').attr("src", "img/bm.jpg");
+							unbind_fangzhi();
+						}
+					});
+				} else if(is_name == "guaishou_zh") {	// 怪兽召唤
+					$("#me-guaishou div").click(function () {
+						if($(this).children('img').attr("src") == "") {
+							gs.next().next().attr('src', '');
+							$(this).children('img').attr("src", src);
+							$(this).children('img').attr("class", "img_zh");
+							id = $(this).children('img').attr('id');
+							io_client.emit("zhaohuan", {id: id})
+							unbind_guaishou();
+						}
+					});
+				} else {	// 怪兽放置
+					$("#me-guaishou div").click(function () {
+						if($(this).children('img').attr("src") == "") {
+							gs.next().next().attr('src', ''); // 手牌去除
+							$(this).children('img').attr("src", "img/bm.jpg");
+							$(this).children('img').css("transform", "rotate(90deg)");
+							$(this).children('img').css("width", "60%");
+							$(this).children('img').css("height", "90px");
+							$(this).children('img').css("top", "-13px");
+							$(this).children('img').attr("class", "img_fz");
+							unbind_guaishou();
+						}
+					});
+				}
+			}
+
+			var src = ""; // 存储图片路径
+			var gs = ""; // 存储zh对象
+			var fz = ""; // 存储fz对象
+
+			// 我方召唤
+			$(".my_hand").on("click", '.zh', function () {
+				unbind_fangzhi();
+				gs = $(this);
+				src = $(this).next().next().attr('src');
+				// 判断区域有没有存在卡牌，有卡牌的区域不加边框
+				id_img = "#me-guaishou div img";
+				is_card_area_border(id_img);
+				// 判断区域有没有存在卡牌，有卡牌的区域不能选
+				is_card_area_no_choose("guaishou_zh");
+			});
+
+			// 我方放置
+			$(".my_hand").on("click", ".fz", function () {
+				unbind_guaishou();
+				fz = $(this);
+				gs = $(this).prev();
+				src = $(this).next().attr('src');
+				var is_card = $(this).parents('a').attr('name');
+				if (is_card == "mofa" || is_card == "xianjing") {
+					// 判断区域有没有存在卡牌，有卡牌的区域不加边框
+					id_img = "#me-fangzhi div img";
+					is_card_area_border(id_img);
+					// 判断区域有没有存在卡牌，有卡牌的区域不能选
+					is_card_area_no_choose("fangzhi");
+				} else {
+					unbind_fangzhi();
+					// 判断区域有没有存在卡牌，有卡牌的区域不加边框
+					id_img = "#me-guaishou div img";
+					is_card_area_border(id_img);
+					// 判断区域有没有存在卡牌，有卡牌的区域不能选
+					is_card_area_no_choose("guaishou_fz");
+				}
+			});
+
+			// 判断对方区域有没有存在卡牌，没卡牌的区域不加边框
+			function is_card_opponent_area_border (id_img) {
+				$(id_img).each(function () {
+					var img_url = $(this).attr("src");
+					if (img_url != "") {
+						$(this).parent().css("border", "1px dashed red");
+						$(this).parent().css("cursor", "Default");
+						$(this).attr('class', 'attacked');
+					} 
+				});
+			}
+
+			// 敌方场地被攻击消除怪兽卡
+			$('.you-guaishou div img').click(function () {
+				if ($(this).attr('class') == 'attacked') {
+					$(this).attr('src', '');
+					$(".you-guaishou div").css("border", "1px solid red");
+					$(".you-guaishou div").css("cursor", "pointer");	
+					$(".you-guaishou div img").attr("class", "");	
+				}
+			});
+
+			// 怪兽反转/攻击
+			$("#me-guaishou div img").click(function () {
+				// 反转
+				if($(this).attr("class") == "img_fz") {
+					var btn = $(this).nextAll(".fanzhuan");
+					btn.fadeIn();
+					btn.click(function () {
+						$(this).prev("img").attr('src', src);
+						$(this).prev("img").css("transform", "rotate(0deg)");
+						$(this).prev('img').css("width", "80%");
+						$(this).prev('img').css("height", "90%");
+						$(this).prev('img').css("top", "0px");
+						$(this).prev("img").attr('class', "img_zh");
+						$(this).remove();
+					})
+				}
+				// 攻击
+				if($(this).attr("class") == "img_zh") {
+					var btn = $(this).nextAll('.gongji');
+					btn.fadeIn();
+					btn.click(function () {
+						// 判断对方区域有没有存在卡牌，没卡牌的区域不加边框
+						is_card_opponent_area_border('.you-guaishou div img');
+						$(this).remove();
+					})
+				}
+
+			});
+
+			// 魔法卡反转发动
+			$("#me-fangzhi div img").click(function () {
+				var btn = $(this).next('button');
+				btn.fadeIn();
+				btn.click(function () {
+					$(this).prev("img").attr('src', src);
+					$(this).prev("img").css("transform", "rotate(0deg)");
+					$(this).prev('img').css("width", "80%");
+					$(this).prev('img').css("height", "90%");
+					$(this).prev('img').css("top", "0px");
+					$(this).remove();
+				});
+			})
+
+			// 抽牌
+			$(".choupai").click(function () {
+				html = '<a name="guaishou" style="position:relative;">\
+							<button class="zh" name="zh" style="position: absolute; top: -50px; left: 10px; width:50px;" hidden="hidden">召唤</button>\
+							<button class="fz"  name="fz" style="position: absolute; top: -20px; left: 10px; width:50px;" hidden="hidden">放置</button>\
+							<img style="height:80px" src="img/1190.jpg" alt="">\
+						</a>';
+				$(".my_hand").append(html);
+			});
+
+			
+
+		})
+	</script>
+</head>
+<body>
+	<div class="headers">
+		<div class="left-border">
+			<div class="left-top">
+				<div class="card-view"><img style="" src="img/1190.jpg" alt=""></div>
+				<div class="over"><input type="button" style="width:100%; height:100px" value="投降"></div>
+				<div class="clear"></div> 
+			</div>
+			<div class="left-bottom">
+				<div style="text-align:center;">青眼白龙</div><br>
+				<span style="color: blue">通常怪兽光龙族</span><br>
+				<span style="color: blue">*8 3000/2500</span><br>
+				<span>描述：以高攻击力而骄傲的传说之龙。不论是怎样的对手都能粉碎，其破坏力无法估量。</span>
+			</div>
+		</div>
+
+		<div class="right-border">
+			<div class="right-top">
+				<div class="left-blood">4000</div>
+				<div class="round">回合</div>
+				<div class="right-blood">4000</div>
+			</div>
+			<div class="right-bottom">
+				<div class="left-card">
+					<div calss="left-you-card">
+						<div>
+							<a><img style="height:47px" src="img/1190.jpg" alt=""></a>
+						</div>
+						<div>
+							<a><img style="height:55px" src="img/1190.jpg" alt=""></a>
+						</div>
+						<div>
+							<a><img style="height:60px" src="img/1190.jpg" alt=""></a>
+						</div>
+					</div>
+					<div class="left-me-card">
+						<div>
+							<div style="position: relative;">
+								<a>
+									<img style="height:70px" src="img/1190.jpg" alt="">
+									<span style="color: red; position: absolute; left: 20px; bottom: 10px">(0)</span>
+								</a>
+							</div>
+							<div style="position: relative;">
+								<a>
+									<img style="height:75px" src="img/bm.jpg" alt="">
+									<span style="color: red; position: absolute; left: 20px; bottom: 10px">(20)</span>
+								</a>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="center-card">
+					<div class="you_hand_card">
+						<div class="you_hand">
+							<a><img id="y1" style="height:47px" src="img/1190.jpg" alt=""></a>
+							<a><img id="y2" style="height:47px" src="img/1190.jpg" alt=""></a>
+							<a><img id="y3" style="height:47px" src="img/1190.jpg" alt=""></a>
+							<a><img id="y4" style="height:47px" src="img/1190.jpg" alt=""></a>
+							<a><img id="y5" style="height:47px" src="img/1190.jpg" alt=""></a>
+						</div>
+					</div>
+					<div class="area">
+						<div>
+							<div style="height:55px"><img id="top1" src="img/1190.jpg" alt=""></div>
+							<div style="height:55px"><img id="top2" src="img/1190.jpg" alt=""></div>
+							<div style="height:55px"><img id="top3" src="img/1190.jpg" alt=""></div>
+							<div style="height:55px"><img id="top4" src="img/1190.jpg" alt=""></div>
+							<div style="height:55px"><img id="top5" src="img/1190.jpg" alt=""></div>
+						</div>
+						<div class="you-guaishou">
+							<div style="height:60px"><img id="top6" src="img/1190.jpg" alt=""></div>
+							<div style="height:60px"><img id="top7" src="img/1190.jpg" alt=""></div>
+							<div style="height:60px"><img id="top8" src="img/1190.jpg" alt=""></div>
+							<div style="height:60px"><img id="top9" src="img/1190.jpg" alt=""></div>
+							<div style="height:60px"><img id="top10" src="" alt=""></div>
+						</div>
+						<div>
+							<div style="height:65px"><img id="cen1" src="img/1190.jpg" alt=""></div>
+							<div style="height:65px"><img id="cen2" src="img/1190.jpg" alt=""></div>
+							<div style="height:65px"><img id="cen3" src="img/1190.jpg" alt=""></div>
+							<div style="height:65px"><img id="cen4" src="img/1190.jpg" alt=""></div>
+							<div style="height:65px"><img id="cen5" src="img/1190.jpg" alt=""></div>
+						</div>
+						<div id="me-guaishou">
+							<div style="height:70px; position:relative">
+								<img id="btm1" src="" alt="">
+								<button class="fanzhuan" name="fanzhuan" style="position: absolute; top: 20px; left: 25px; width:50px;" hidden="hidden">反转</button>
+								<button class="gongji" name="gongji" style="position: absolute; top: 20px; left: 25px; width:50px;" hidden="hidden">攻击</button>
+							</div>
+							<div style="height:70px; position:relative">
+								<img id="btm2" src="" alt="">
+								<button class="fanzhuan" name="fanzhuan" style="position: absolute; top: 20px; left: 25px; width:50px;" hidden="hidden">反转</button>
+								<button class="gongji" name="gongji" style="position: absolute; top: 20px; left: 25px; width:50px;" hidden="hidden">攻击</button>
+							</div>
+							<div style="height:70px; position:relative">
+								<img id="btm3" src="" alt="">
+								<button class="fanzhuan" name="fanzhuan" style="position: absolute; top: 20px; left: 25px; width:50px;" hidden="hidden">反转</button>
+								<button class="gongji" name="gongji" style="position: absolute; top: 20px; left: 25px; width:50px;" hidden="hidden">攻击</button>
+							</div>
+							<div style="height:70px; position:relative">
+								<img id="btm4" src="" alt="">
+								<button class="fanzhuan" name="fanzhuan" style="position: absolute; top: 20px; left: 25px; width:50px;" hidden="hidden">反转</button>
+								<button class="gongji" name="gongji" style="position: absolute; top: 20px; left: 25px; width:50px;" hidden="hidden">攻击</button>
+							</div>
+							<div style="height:70px; position:relative">
+								<img id="btm5" src="" alt="">
+								<button class="fanzhuan" name="fanzhuan" style="position: absolute; top: 20px; left: 25px; width:50px;" hidden="hidden">反转</button>
+								<button class="gongji" name="gongji" style="position: absolute; top: 20px; left: 25px; width:50px;" hidden="hidden">攻击</button>
+							</div>
+						</div>
+						<div id="me-fangzhi">
+							<div style="height:75px; position:relative">
+								<img id="btm6" src="" alt="">
+								<button class="fadong" name="fadong" style="position: absolute; top: 20px; left: 25px; width:50px;" hidden="hidden">发动</button>
+							</div>
+							<div style="height:75px; position:relative">
+								<img id="btm7" src="" alt="">
+								<button class="fadong" name="fadong" style="position: absolute; top: 20px; left: 25px; width:50px;" hidden="hidden">发动</button>
+							</div>
+							<div style="height:75px; position:relative">
+								<img id="btm8" src="" alt="">
+								<button class="fadong" name="fadong" style="position: absolute; top: 20px; left: 25px; width:50px;" hidden="hidden">发动</button>
+							</div>
+							<div style="height:75px; position:relative">
+								<img id="btm9" src="" alt="">
+								<button class="fadong" name="fadong" style="position: absolute; top: 20px; left: 25px; width:50px;" hidden="hidden">发动</button>
+							</div>
+							<div style="height:75px; position:relative">
+								<img id="btm10" src="" alt="">
+								<button class="fadong" name="fadong" style="position: absolute; top: 20px; left: 25px; width:50px;" hidden="hidden">发动</button>
+							</div>
+						</div>
+					</div>
+					<div class="my_hand_card">
+						<div class="my_hand" style="width:547px;">
+							<a name="guaishou" style="position:relative;">
+								<button class="zh" name="zh" style="position: absolute; top: -50px; left: 10px; width:50px;" hidden="hidden">召唤</button>
+								<button class="fz" name="fz" style="position: absolute; top: -20px; left: 10px; width:50px;" hidden="hidden">放置</button>
+								<img id="m1" style="height:80px" src="img/1190.jpg" alt="">
+							</a>
+							<a name="mofa" style="position:relative;">
+								<button class="zh" name="zh" style="position: absolute; top: -50px; left: 10px; width:50px;" hidden="hidden">召唤</button>
+								<button class="fz"  name="fz" style="position: absolute; top: -20px; left: 10px; width:50px;" hidden="hidden">放置</button>
+								<img id="m2" style="height:80px" src="img/1190.jpg" alt="">
+							</a>
+							<a name="mofa" style="position:relative;">
+								<button class="zh" name="zh" style="position: absolute; top: -50px; left: 10px; width:50px;" hidden="hidden">召唤</button>
+								<button class="fz"  name="fz" style="position: absolute; top: -20px; left: 10px; width:50px;" hidden="hidden">放置</button>
+								<img id="m3" style="height:80px" src="img/1190.jpg" alt="">
+							</a>
+							<a name="guaishou" style="position:relative;">
+								<button class="zh" name="zh" style="position: absolute; top: -50px; left: 10px; width:50px;" hidden="hidden">召唤</button>
+								<button class="fz"  name="fz" style="position: absolute; top: -20px; left: 10px; width:50px;" hidden="hidden">放置</button>
+								<img id="m4" style="height:80px" src="img/1190.jpg" alt="">
+							</a>
+							<a name="guaishou" style="position:relative;">
+								<button class="zh" name="zh" style="position: absolute; top: -50px; left: 10px; width:50px;" hidden="hidden">召唤</button>
+								<button class="fz"  name="fz" style="position: absolute; top: -20px; left: 10px; width:50px;" hidden="hidden">放置</button>
+								<img id="m5" style="height:80px" src="img/1190.jpg" alt="">
+							</a>
+						</div>
+					</div>
+				</div>
+				<div class="right-card">
+					<div calss="right-you-card">
+						<div>
+							<a><img style="height:47px" src="img/1190.jpg" alt=""></a>
+						</div>
+						<div>
+							<a><img style="height:55px" src="img/1190.jpg" alt=""></a>
+						</div>
+					</div>
+					<div class="right-me-card">
+						<div>
+							<div style="position: relative;">
+								<a>
+									<img style="height:65px" src="img/1190.jpg" alt="">
+									<span style="color: red; position: absolute; left: 20px; bottom: 10px">(0)</span>
+								</a>
+							</div>
+							<div style="position: relative;">
+								<a>
+									<img style="height:70px" src="img/1190.jpg" alt="">
+									<span style="color: red; position: absolute; left: 20px; bottom: 10px">(0)</span>
+								</a>
+							</div>
+							<div style="position: relative;">
+								<a>
+									<img style="height:75px" src="img/bm.jpg" alt="">
+								</a>
+								<span style="color: red; position: absolute; left: 20px; bottom: 30px">(40)</span>
+								<button class="choupai" name="choupai" style="width:50px;">抽牌</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

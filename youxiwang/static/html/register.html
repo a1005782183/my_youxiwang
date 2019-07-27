@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>注册</title>
+	<script src="js/jquery.min.js"></script>
+
+	<style>
+		* {
+			margin: 0;
+			padding: 0;
+			font-family:"楷体"
+		}
+
+		ul, li {
+			margin: 0;
+			padding: 0;
+			list-style: none;
+		}
+		a {
+			cursor:pointer;
+			text-decoration: none;
+			color: white;
+		}
+
+		.daohang {
+			width: 1325px;
+			height: 96px;
+			background-color: black;
+			margin-left: 18px;
+			border-radius: 20px;
+			margin-top: 10px;
+			position: relative;
+		}
+
+		.left-daohang li:first-child, .left-daohang li:nth-child(2){
+			float: left;
+			border-right: 1px solid gray;
+			height: 96px;
+		}
+
+		.left-daohang a {
+			font-size: 30px;
+			line-height: 96px;
+			text-align: center;
+			margin: 0 20px;
+			color: white;
+		}
+
+		.right-daohang {
+			position: absolute;
+			right: 20px;
+			top: 0px;
+		}
+
+		.right-daohang li {
+			float: left;
+			color: white;
+		}
+
+		.right-daohang li {
+			margin: 0 5px;
+			font-size: 30px;
+			line-height: 96px;
+			text-align: center;
+		}
+		
+		.center-body {
+			width: 460px;
+			height: 396px;
+			background-color: black;
+			margin: 0 auto;
+			margin-top: 40px;
+		}
+		
+		.center-body form {
+			padding-top: 80px;
+		}
+
+		.center-body form input{
+			display: block;
+			margin: 0 auto;
+			margin-top: 40px;
+		}
+
+		.center-body form input::-webkit-input-placeholder {
+	       /* placeholder颜色  */
+	       color: 	#FFC0CB;
+	       /* placeholder字体大小  */
+	       font-size: 20px;
+	    }
+
+	    body, .center-body {
+	    	background: url('img/timg.jpg');
+	    }
+
+
+	</style>
+</head>
+<body>
+	<div class="headers">
+		<!-- 导航栏 -->
+		<div class="daohang">
+			<ul class="left-daohang">
+				<li><a href="/index.html">首页</a></li>
+				<li><a href="/goods.html">商城</a></li>
+				<li><a href="/game.html">Go!Game.</a></li>
+			</ul>
+			<ul class="right-daohang">
+				<li><a href="/login.html">登录</a></li>
+				<li><span>|</span></li>
+				<li><a href="/register.html">注册</a></li>
+				<li><input type="text" style="position: relative; bottom: 5px; width: 150px; border-radius: 5px; height: 30px; font-size: 15px; text-align: center;" placeholder="搜索"></li>
+				<li><input type=button style="position: relative; bottom: 4px;background:white; width: 60px; height: 30px; border-radius: 5px;" value="搜素"></li>
+			</ul>
+		</div>
+
+		<!-- 中间层内容-->
+		<div class="center-body" style="border-radius: 30px;">
+			<form class="form-register">
+				<input type="text" id="username" style="width: 300px; border-radius: 5px; height: 40px; font-size: 20px; text-align: center;" placeholder="请输入账号" name="username">
+				<input type="password" id="password" style="width: 300px; border-radius: 5px; height: 40px; font-size: 20px; text-align: center;" placeholder="请输入密码" name="password">
+				<input type="submit" style="background:white; width: 160px; height: 50px; font-size: 30px; border-radius: 5px;" value="注册">
+			</form>
+		</div>
+	</div>
+	<script>
+		// js读取cookie的方法
+		function getCookie(name) {
+		    var r = document.cookie.match("\\b" + name + "=([^;]*)\\b");
+		    return r ? r[1] : undefined;
+		}
+
+		$(function () {
+			$(".form-register").submit(function (e) {
+				e.preventDefault();
+
+				var username = $("#username").val();
+				var password = $("#password").val();
+
+				var data = {
+					username: username,
+					password: password
+				}
+
+				// 转换json格式
+				json_data = JSON.stringify(data);
+
+				$.ajax({
+					url: "/register",
+					data: json_data,
+					type: "post",
+					dataType: "json",
+					contentType: "application/json",
+					headers: {
+			    		"X-CSRFToken": getCookie("csrf_token")
+			    	},
+					success: function(res) {
+						if (res.errno == "0") {
+							alert(res.errmsg);
+							location.href = "/login.html"
+						} else {
+							alert(res.errmsg);
+						}
+					}
+				})
+			})
+		})
+	</script>
+</body>
+</html>

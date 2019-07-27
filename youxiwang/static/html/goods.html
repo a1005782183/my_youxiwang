@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>商城</title>
+	<style>
+		* {
+			margin: 0;
+			padding: 0;
+			font-family:"楷体"
+		}
+
+		ul, li {
+			margin: 0;
+			padding: 0;
+			list-style: none;
+		}
+		a {
+			cursor:pointer;
+			text-decoration: none;
+			margin: 0;
+			padding: 0;
+			color: white;
+		}
+
+		.daohang {
+			width: 1325px;
+			height: 96px;
+			background-color: black;
+			margin-left: 18px;
+			border-radius: 20px;
+			margin-top: 10px;
+			position: relative;
+		}
+
+		.left-daohang li:first-child, .left-daohang li:nth-child(2){
+			float: left;
+			border-right: 1px solid gray;
+			height: 96px;
+		}
+
+		.left-daohang a {
+			font-size: 30px;
+			line-height: 96px;
+			text-align: center;
+			margin: 0 20px;
+			color: white;
+		}
+
+		.right-daohang {
+			position: absolute;
+			right: 20px;
+			top: 0px;
+		}
+
+		.right-daohang li {
+			float: left;
+			color: white;
+		}
+
+		.right-daohang li {
+			margin: 0 5px;
+			font-size: 30px;
+			line-height: 96px;
+			text-align: center;
+		}
+		
+		.center-body {
+			width: 1325px;
+			background-color: black;
+			margin: 0 auto;
+			margin-top: 40px;
+			margin-left: 15px;
+			border-top-left-radius: 20px;
+			border-top-right-radius: 20px;
+		}
+		
+		.center-header {
+			width: 968px;
+			height: 55px;
+			border-radius: 10px;
+			/*background-color: white;*/
+			line-height: 55px;
+			font-size: 30px;
+			background-image: url("img/timg.jpg")
+		}
+
+		.center-header select, .center-header button {
+			width: 80px;
+			height: 30px;
+			font-size: 20px;
+			position: relative;
+			bottom: 3px;
+			background-color: white;
+			border-radius: 5px;
+		}
+
+		.center-header select, .center-header span, .center-header button {
+			margin-left: 20px;
+		}
+
+		.show-card div {
+			width: 267px;
+			height: 302px;
+			margin:44px 0 0 44px;
+			display: inline-block;
+			position: relative;
+		}
+
+		.show-card div button:nth-child(2) {
+			position: absolute;
+			float: left;
+			top: 262px;
+		}
+
+		.show-card div button:nth-child(3) {
+			position: absolute;
+			left: 167px;
+			top: 262px;
+		}
+
+		.show-card div button:nth-child(2), .show-card div button:nth-child(3) {
+			width: 100px;
+			height: 40px;
+			font-size: 20px;
+			color: gold;
+			border: 0px;
+			background-image: url("img/timg.jpg")
+		}
+
+		.pages {
+			text-align: center
+		}
+
+		.pages ul {
+			height:60px;
+		}
+
+		.pages ul a li {
+			margin: -4px;
+			padding: 10px;
+			margin-top: 10px;
+			width: 20px;
+			display: inline-block;
+			border: 1px solid #B0C4DE;
+			background-color: white;
+		}
+
+		.pages ul a{
+			color: #5F9EA0;
+		}
+
+		.prev-page {
+			border-top-left-radius: 10px;
+			border-bottom-left-radius: 10px;
+		}
+
+		.next-page {
+			border-top-right-radius: 10px;
+			border-bottom-right-radius: 10px;
+		}
+
+		[v-cloak] {
+		    display: none !important;
+		}
+
+	    body {
+	    	background: url('img/timg.jpg');
+	    }
+	
+	</style>
+
+	<script src="js/jquery.min.js"></script>
+	<script>
+		$(document).ready(function () {
+
+			// 分页按钮active背景色
+			$(".pagination li").each(function () {
+				if ($(this).attr('class') == "active") {
+					$(this).css("background-color", '	#D2B48C');
+				}
+			})
+		})
+
+	</script>
+</head>
+<body>
+	<div id="app" class="headers" v-cloak>
+		<!-- 导航栏 -->
+		<div class="daohang">
+			<ul class="left-daohang">
+				<li><a href="/index.html">首页</a></li>
+				<li><a href="/goods.html">商城</a></li>
+				<li><a href="/game.html">Go!Game.</a></li>
+			</ul>
+			<ul class="right-daohang">
+				<template v-if="data">
+					<li><a>欢迎回来：{{data}}</a></li>
+				</template>
+				<template v-else>
+					<li><a href="/login.html">登录</a></li>
+					<li><span>|</span></li>
+					<li><a href="/register.html">注册</a></li>
+				</template>
+				<li><input type="text" style="position: relative; bottom: 5px; width: 150px; border-radius: 5px; height: 30px; font-size: 15px; text-align: center;" placeholder="搜索" v-model="s" @keyup.enter="search_func()"></li>
+				<li><input type=button style="position: relative; bottom: 4px;background:white; width: 60px; height: 30px; border-radius: 5px;" value="搜素" @click="search_func()"></li>
+			</ul>
+		</div>
+
+		<!-- 中间层内容-->
+		<div class="center-body">
+			<div class="center-header">
+				<span>排序:</span>
+				<select name="" id="">
+					<option value="">选项</option>
+					<option value="">古天乐刘德华</option>
+				</select>
+				<select name="" id="">
+					<option value="">选项</option>
+				</select>
+				<select name="" id="">
+					<option value="">选项</option>
+				</select>
+				<select name="" id="">
+					<option value="">选项</option>
+				</select>
+				<select name="" id="">
+					<option value="">选项</option>
+				</select>
+				<select name="" id="">
+					<option value="">选项</option>
+				</select>
+				<button>查询</button>
+			</div>
+			<div class="show-card">
+				<div v-for="c in cards">
+					<img style="width: 100%; height: 100%;" :src="'image/'+c.img">
+					<button @click="add_card(c.id)">添加</button>
+					<button @click="onClick(c.id)">详情</button>
+				</div>
+			</div>
+			<nav class="pages">
+			  <ul class="pagination clear">
+			    <a :href="'/goods.html?'+prev_num+'&'+search" v-if="has_prev"><li class="prev-page"><<</li></a>
+			    <a :href="'/goods.html?'+page+'&'+search" v-for="page in iter_pages">
+			    	<li class="">{{ page }}</li>
+			    </a>
+			    <a :href="'/goods.html?'+next_num+'&'+search" v-if="has_next"><li class="next-page">>></li></a>
+			  </ul>
+			</nav>
+		</div>
+	</div>
+
+
+	<script src="js/axios.min.js"></script>
+	<script src="js/vue.js"></script>
+	<script src="js/goods.js"></script>
+</body>
+</html>
