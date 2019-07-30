@@ -16,7 +16,7 @@
 			border: 0px;
 		}
 
-		#bj {
+		.headers {
 			background: url("img/bg.jpg");
 			position:fixed;
 		  	top: 0;
@@ -34,18 +34,6 @@
 			background-position: center 0;
 			padding: 10px;
 		}
-
-		.headers {
-			width: 1325px;
-			height: 595px;
-			text-align: center;
-			position: absolute;
-            top:0;
-            left: 0;
-            right: 0;
-            bottom:0;
-            margin: auto;
-		}	
 
 		/*左边框*/
 		.left-border {
@@ -80,9 +68,9 @@
 
 		/*右边框*/
 		.right-border {
-			position: relative;
+			position: absolute;
 			left: 500px;
-			width: auto;
+			width: 812px;
 		}
 
 		/*右上边框*/
@@ -393,7 +381,6 @@
 				setTimeout(function () { 
 					flush_card_group(); // 刷新对方卡组
 			    }, 500);
-				$('#jieshu').fadeIn();
 			})
 
 			function user(user_name) {
@@ -412,7 +399,6 @@
 				setTimeout(function () { 
 					flush_card_group(); // 刷新对方卡组
 			    }, 500);
-				$("#jieshu").fadeIn();
 			})
 
 			// 卡牌socket
@@ -478,9 +464,9 @@
 				
 			})
 
-			// 送去我方墓地
+			// 送去墓地
 			io_client.on("rv_md_card", function (resp) {
-				console.log("我方墓地");
+				console.log("墓地");
 				var resp = JSON.parse(resp);
 				var md_num = resp.md_num;
 				var md_img = resp.md_img;
@@ -495,30 +481,11 @@
 
 			})
 
-			// 送去敌方墓地
-			io_client.on("rv_you_md_card", function (resp) {
-				console.log("敌方墓地");
-				var resp = JSON.parse(resp);
-				var md_num = resp.md_num;
-				var md_img = resp.md_img;
-				var id = resp.id;
-				// 去除放置卡片送去墓地还遗留的css
-				$("#"+card_dict[id]).css("transform", "rotate(0deg)");
-				$("#"+card_dict[id]).css("width", "80%");
-				$("#"+card_dict[id]).css("height", "90%");
-				$("#"+card_dict[id]).css("top", "0px");
-				$("#y-mudi").prev().attr("src", md_img);
-				$("#y-mudi").html("("+md_num+")");
-
-			})
-
 			// 放置卡牌送去墓地保存的图片
 			io_client.on('recv_src', function (resp) {
 				console.log("墓地卡片");
 				var resp = JSON.parse(resp); 
 				$("#"+card_dict[resp.id]).attr("md_img", resp.src); 
-				$("#"+card_dict[resp.id]).attr("atk", resp.atk); 
-				$("#"+card_dict[resp.id]).attr("def", resp.defend); 
 			})
 
 			// 回合结束 交换回合
@@ -529,80 +496,53 @@
 				io_client.emit("token", username);
 				io_client.emit("swap", username_list[1]);
 				$(this).fadeOut();
-				hide_btn(); // 隐藏所有按钮
-				unbind_guaishou(); // 解绑怪兽区域
-				unbind_fangzhi(); // 解绑魔法区域
-				bottom_hand(); // 手牌回收
-				move_gj_class(".you-guaishou div img"); // 移除攻击多次事件
-				un_bind(1); // 手牌点击事件
 			})
 
-			// 隐藏所有按钮
-			function hide_btn () {
-				$(".zh").fadeOut();
-				$(".fz").fadeOut();
-				$(".fanzhuan").fadeOut();
-				$(".fadong").fadeOut();
-				$(".gongji").fadeOut();
-			}
-			// 手牌回收
-			function bottom_hand () {
-				$(".my_hand a").each(function () {
-					$(this).css("top", 0);
-				});
-			}
 
 			//---------------------------------------------------------------------------------------
 			// 点击手牌向上偏移
-			function un_bind (un_b) {
-				if (un_b == 1) {
-					$(".my_hand").on('click', 'a', function(){
-						hide_btn();
-						var card_id = $(this).attr('card_id');
-						// 点击显示卡牌信息
-						$.get("/fund_card", {card_id: card_id}, function (resp) {
-							$(".card-view").find('img').attr('src', "image/"+resp.img);
-							$(".left-bottom div").html(resp.name);
-							var card_type = resp.card_type;
-							var race = resp.race;
-							var attr = resp.attribute;
-							var str = ""
-							if (race != "") {
-								str = "["+ card_type +"]" + race +"/"+ attr;
-							} else {
-								str = "["+ card_type +"]";
-							}
-							if((resp.card_type).indexOf("怪兽") > -1) {
-								var star = resp.level;
-								var atk = resp.atk;
-								var def = resp.defend;
-								var s = "["+ star +"]" + atk + "/" + def;
-								$("#view-atk").html(s);
-							}
-							$("#view-attr").html(str);
-							$("#view-desc").html(resp.desc);
-						})
-						if(i == 1) {
-							t.unshift($(this))
-						}
-						i++;
-						var g = t.pop();
-						t.unshift($(this));
-						if (g.is($(this))) {	// 如果点击的牌是上一次点击的牌就执行
-							card(g);	
-						} else if (!g.is($(this)) && a == false) {	// 如果点击的牌不是上一次点击的牌并且a=false就执行
-							card(g);
-							card($(this));
-						} else {	// 如果点击的牌不是上一次点击的牌并且a=true就执行
-							card($(this));
-						}
-					});
-				} else {
-					$(".my_hand").off('click', 'a');
+			$(".my_hand").on('click', 'a', function(){
+				var card_id = $(this).attr('card_id');
+				// 点击显示卡牌信息
+				$.get("/fund_card", {card_id: card_id}, function (resp) {
+					$(".card-view").find('img').attr('src', "image/"+resp.img);
+					$(".left-bottom div").html(resp.name);
+					var card_type = resp.card_type;
+					var race = resp.race;
+					var attr = resp.attribute;
+					var str = ""
+					if (race != "") {
+						str = "["+ card_type +"]" + race +"/"+ attr;
+					} else {
+						str = "["+ card_type +"]";
+					}
+					if((resp.card_type).indexOf("怪兽") > -1) {
+						var star = resp.level;
+						var atk = resp.atk;
+						var def = resp.defend;
+						var s = "["+ star +"]" + atk + "/" + def;
+						$("#view-atk").html(s);
+					}
+					$("#view-attr").html(str);
+					$("#view-desc").html(resp.desc);
+				})
+				if(i == 1) {
+					t.unshift($(this))
 				}
+				i++;
+				var g = t.pop();
+				t.unshift($(this));
+				if (g.is($(this))) {	// 如果点击的牌是上一次点击的牌就执行
+					card(g);	
+				} else if (!g.is($(this)) && a == false) {	// 如果点击的牌不是上一次点击的牌并且a=false就执行
+					card(g);
+					card($(this));
+				} else {	// 如果点击的牌不是上一次点击的牌并且a=true就执行
+					card($(this));
+				}
+			});
 
-			}
-			un_bind(1);
+			
 
 			// 解绑怪兽区域
 			function unbind_guaishou() {
@@ -663,7 +603,7 @@
 							$(this).children('img').attr("class", "img_zh");
 							// 卡牌召唤socket
 							id = $(this).children('img').attr('id');
-							io_client.emit("send_src", id, src, atk, defend, username); // 放置卡牌送去墓地保存的图片
+							io_client.emit("send_src", id, src, username); // 放置卡牌送去墓地保存的图片
 							io_client.emit("zh_card_luoji", id, src, atk, defend, username);
 							remove_your_hand(); // 移除手卡
 							unbind_guaishou();
@@ -685,7 +625,7 @@
 							$(this).children('img').attr("md_img", src); // 被攻击送去墓地存储的图片
 							// 卡牌召唤socket
 							fz_id = $(this).children('img').attr('id');
-							io_client.emit("send_src", fz_id, src, fz_atk, fz_defend, username); // 放置卡牌送去墓地保存的图片
+							io_client.emit("send_src", fz_id, src, username); // 放置卡牌送去墓地保存的图片
 							fz_img = "img/bm.jpg";
 							io_client.emit("card_luoji", fz_id, fz_img, username);
 							remove_your_hand(); // 移除手卡
@@ -748,171 +688,84 @@
 					} 
 				});
 			}
-			// 移除攻击class，防止攻击多次
-			function move_gj_class (id_img) {
-				$(id_img).each(function () {
-					var img_url = $(this).attr("src");
-					if (img_url != "") {
-						$(this).parent().css("border", "1px solid #708090");
-						$(this).parent().css("cursor", "pointer");
-						$(this).attr('class', '');
-					} 
-				});
-			}
+
+			var md_num = 0; // 墓地计数
 
 			// 敌方场地被攻击消除怪兽卡
 			$('.you-guaishou div img').click(function () {
-				bottom_hand(); // 手牌回收
-				my_atk = parseInt(my_atk);
-				if ($(this).attr('src') == 'img/bm.jpg') {
-					you_def = $(this).attr("def"); // 被攻击方卡片防守力
-					console.log("进来防守");
-					you_def = parseInt(you_def);
-					if (my_atk > you_def) { // 攻击力高于敌方
-						// 墓地卡片 -- start --
-						var md_img = $(this).attr("md_img");
-						console.log(md_img);
-						var you_md_num = $("#y-mudi").text().replace("(","").replace(")","");
-						you_md_num = parseInt(you_md_num)+1;
-						$("#y-mudi").prev().attr("src", md_img);
-						$("#y-mudi").html("("+you_md_num+")");
-						//  墓地卡片 -- end --
-						$(this).attr('src', '');
-						$(this).nextAll("span").hide();
-						$(".you-guaishou div").css("border", "1px solid #708090");
-						$(".you-guaishou div").css("cursor", "pointer");	
-						$(".you-guaishou div img").attr("class", "");
-						// 卡牌攻击socket
-						var id = $(this).attr('id');
-						var img = '';
-						io_client.emit("gj_card_luoji", id, img, username);
-						io_client.emit("md_card", id, you_md_num, md_img, username)
-					} else if (my_atk == you_def) {
-						return;
-					} else { // 攻击力低于敌方
-						console.log("攻击力太低");
-						var my_md_num = $("#mudi").text().replace("(","").replace(")","");
-						my_md_num = parseInt(my_md_num)+1;
-						my_img = my_gj_obj.attr('src');
-						my_gj_obj.attr("src", '');
-						my_gj_obj.nextAll("span").hide();
-						$("#mudi").prev().attr("src", my_img);
-						$("#mudi").html("("+my_md_num+")");
-						$(".you-guaishou div").css("border", "1px solid #708090");
-						$(".you-guaishou div").css("cursor", "pointer");
-						// 卡牌攻击socket
-						var id = my_gj_obj.attr('id');
-						var img = '';
-						io_client.emit("gj_card_luoji", id, img, username);
-						io_client.emit("you_md_card", id, my_md_num, my_img, username);
-					}
-				} else if ($(this).attr('class') == 'attacked') {
-					you_atk = $(this).next('span').text().split('/')[0] // 被攻击方卡片攻击力
-					you_atk = parseInt(you_atk);
-					if (my_atk > you_atk) { // 攻击力高于敌方
-						// 墓地卡片 -- start --
-						var md_img = $(this).attr("md_img");
-						console.log(md_img);
-						var you_md_num = $("#y-mudi").text().replace("(","").replace(")","");
-						you_md_num = parseInt(you_md_num)+1;
-						$("#y-mudi").prev().attr("src", md_img);
-						$("#y-mudi").html("("+you_md_num+")");
-						//  墓地卡片 -- end --
-						$(this).attr('src', '');
-						$(this).nextAll("span").hide();
-						$(".you-guaishou div").css("border", "1px solid #708090");
-						$(".you-guaishou div").css("cursor", "pointer");	
-						$(".you-guaishou div img").attr("class", "");
-						// 卡牌攻击socket
-						var id = $(this).attr('id');
-						var img = '';
-						io_client.emit("gj_card_luoji", id, img, username);
-						io_client.emit("md_card", id, you_md_num, md_img, username)
-					} else if (my_atk == you_atk) {
-						return;
-					} else { // 攻击力低于敌方
-						console.log("攻击力太低");
-						var my_md_num = $("#mudi").text().replace("(","").replace(")","");
-						my_md_num = parseInt(my_md_num)+1;
-						my_img = my_gj_obj.attr('src');
-						my_gj_obj.attr("src", '');
-						my_gj_obj.nextAll("span").hide();
-						$("#mudi").prev().attr("src", my_img);
-						$("#mudi").html("("+my_md_num+")");
-						$(".you-guaishou div").css("border", "1px solid #708090");
-						$(".you-guaishou div").css("cursor", "pointer");
-						// 卡牌攻击socket
-						var id = my_gj_obj.attr('id');
-						var img = '';
-						io_client.emit("gj_card_luoji", id, img, username);
-						io_client.emit("you_md_card", id, my_md_num, my_img, username);
-					}
-				}
-				move_gj_class('.you-guaishou div img');
-			});
-
-			var my_gj_obj = ""; // 攻击卡片的存储对象
-			var my_atk = ""; // 攻击卡片的攻击力			
-			// 怪兽反转/攻击
-			$("#me-guaishou div img").click(function () {
-				bottom_hand(); // 手牌回收
-				// 反转
-				if($(this).attr("class") == "img_fz") {
-					var btn = $(this).nextAll(".fanzhuan");
-					$("#me-guaishou").children().find("button").hide(); // 不是当前点击的场地怪兽卡牌隐藏攻击
-					$("#me-fangzhi").children().find("button").hide(); // 不是当前点击的魔法怪兽卡牌隐藏攻击
-					$('.zh').fadeOut();
-					$('.fz').fadeOut();
-					if (token == 1) {
-						btn.fadeIn();
-						btn.click(function () {
-							img = $(this).prev("img").attr("md_img");
-							io_client.emit("zh_card_luoji", fz_id, fz_img, fz_atk, fz_defend, username);
-							$(this).nextAll('span').show();
-							$(this).prev("img").attr('src', img);
-							$(this).prev("img").css("transform", "rotate(0deg)");
-							$(this).prev('img').css("width", "80%");
-							$(this).prev('img').css("height", "90%");
-							$(this).prev('img').css("top", "0px");
-							$(this).prev("img").attr('class', "img_zh");
-							// 卡牌反转socket
-							id = $(this).prev("img").attr('id');
-							io_client.emit("card_luoji", id, img, username);
-							$(this).fadeOut();
-						})
-					}
-					
-				}
-				// 攻击
-				if($(this).attr("class") == "img_zh") {
-					my_gj_obj = $(this);
-					var btn = $(this).nextAll('.gongji');
-					$("#me-guaishou").children().find("button").hide(); // 不是当前点击的场地怪兽卡牌隐藏攻击
-					$("#me-fangzhi").children().find("button").hide(); // 不是当前点击的魔法怪兽卡牌隐藏攻击
-					$('.zh').fadeOut();
-					$('.fz').fadeOut();
-					if (token == 1) {
-						btn.fadeIn();
-						btn.click(function () {
-							un_bind (0);
-							// 判断对方区域有没有存在卡牌，没卡牌的区域不加边框
-							is_card_opponent_area_border('.you-guaishou div img');
-							$(this).fadeOut();
-							my_atk = $(this).next('span').text().split('/')[0]
-						})
-					}
+				if ($(this).attr('class') == 'attacked') {
+					// 墓地卡片 -- start --
+					var md_img = $(this).attr("md_img");
+					console.log(md_img);
+					md_num++;
+					$("#y-mudi").prev().attr("src", md_img);
+					$("#y-mudi").html("("+md_num+")");
+					//  墓地卡片 -- end --
+					$(this).attr('src', '');
+					$(this).nextAll("span").hide();
+					$(".you-guaishou div").css("border", "1px solid #708090");
+					$(".you-guaishou div").css("cursor", "pointer");	
+					$(".you-guaishou div img").attr("class", "");
+					// 卡牌攻击socket
+					var id = $(this).attr('id');
+					var img = '';
+					io_client.emit("gj_card_luoji", id, img, username);
+					io_client.emit("md_card", id, md_num, md_img, username)
 				}
 			});
 
 			
-			// 魔法卡反转发动
+			// 怪兽反转/攻击
+			$("#me-guaishou div img").click(function () {
+
+				// 反转
+					if($(this).attr("class") == "img_fz") {
+						var btn = $(this).nextAll(".fanzhuan");
+						$("#me-guaishou").children().find("button").hide(); // 不是当前点击的场地怪兽卡牌隐藏攻击
+						$("#me-fangzhi").children().find("button").hide(); // 不是当前点击的魔法怪兽卡牌隐藏攻击
+						if (token == 1) {
+							btn.fadeIn();
+							btn.click(function () {
+								img = $(this).prev("img").attr("md_img");
+								io_client.emit("zh_card_luoji", fz_id, fz_img, fz_atk, fz_defend, username);
+								$(this).nextAll('span').show();
+								$(this).prev("img").attr('src', img);
+								$(this).prev("img").css("transform", "rotate(0deg)");
+								$(this).prev('img').css("width", "80%");
+								$(this).prev('img').css("height", "90%");
+								$(this).prev('img').css("top", "0px");
+								$(this).prev("img").attr('class', "img_zh");
+								// 卡牌反转socket
+								id = $(this).prev("img").attr('id');
+								io_client.emit("card_luoji", id, img, username);
+								$(this).fadeOut();
+							})
+						}
+						
+					}
+					// 攻击
+					if($(this).attr("class") == "img_zh") {
+						var btn = $(this).nextAll('.gongji');
+						$("#me-guaishou").children().find("button").hide(); // 不是当前点击的场地怪兽卡牌隐藏攻击
+						$("#me-fangzhi").children().find("button").hide(); // 不是当前点击的魔法怪兽卡牌隐藏攻击
+						if (token == 1) {
+							btn.fadeIn();
+							btn.click(function () {
+								// 判断对方区域有没有存在卡牌，没卡牌的区域不加边框
+								is_card_opponent_area_border('.you-guaishou div img');
+								$(this).fadeOut();
+							})
+						}
+					}
+
+			});
+
+			
+				// 魔法卡反转发动
 			$("#me-fangzhi div img").click(function () {
-				bottom_hand(); // 手牌回收
 				var btn = $(this).next('button');
 				$("#me-guaishou").children().find("button").hide(); // 不是当前点击的场地怪兽卡牌隐藏攻击
 				$("#me-fangzhi").children().find("button").hide(); // 不是当前点击的魔法怪兽卡牌隐藏攻击
-				$('.zh').fadeOut();
-				$('.fz').fadeOut();
 				if (token == 1) {
 					btn.fadeIn();
 					btn.click(function () {
@@ -971,9 +824,8 @@
 	</script>
 </head>
 <body>
-	<div id="bj"></div>
 	<div id="overlay" style="text-align: center; line-height: 500px; font-size: 60px; color: red;">等待客户端连接</div>
-	
+	<div id="huihe" style="width: 200px; height: 200px; font-size: 30px; color: red; text-align: center; line-height: 500px; z-index: 900; position: absolute; top: -180px; left: 50%;" hidden="hidden"></div>
 	<div id="app" class="headers" v-cloak>
 		<div class="left-border">
 			<div class="left-top">
@@ -994,7 +846,6 @@
 				<div class="left-blood">4000</div>
 				<div class="round">回合</div>
 				<div class="right-blood">4000</div>
-				<div id="huihe" style="font-size: 30px; color: red; text-align: center; line-height: 50px; z-index: 900;" hidden="hidden"></div>
 			</div>
 			<div class="right-bottom">
 				<div class="left-card">
@@ -1070,7 +921,7 @@
 							<div style="height:65px"><img id="cen3" src="" alt=""></div>
 							<div style="height:65px"><img id="cen4" src="" alt=""></div>
 							<div style="height:65px">
-								<button id="jieshu" style="position: relative; top: 20px" hidden="hidden">结束</button>
+								<button id="jieshu" style="position: relative; top: 20px">结束</button>
 							</div>
 						</div>
 						<div id="me-guaishou" style="width: 200%; height: 100%; float: left; position: relative; left: -275px;">

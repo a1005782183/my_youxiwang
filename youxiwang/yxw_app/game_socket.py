@@ -100,19 +100,27 @@ def remove_your_hand(username):
 
 @socket_io.on("md_card")
 def md_card(id, md_num, md_img, username):
-	'''墓地卡片'''
+	'''我方墓地卡片'''
 	if username == 'admin1':
 		socket_io.emit(event="rv_md_card", data=json.dumps({"id":id, "md_num": md_num, "md_img": md_img}), room="admin")
 	if username == 'admin':
 		socket_io.emit(event="rv_md_card", data=json.dumps({"id":id, "md_num": md_num, "md_img": md_img}), room="admin1")
 
+@socket_io.on("you_md_card")
+def you_md_card(id, md_num, md_img, username):
+	'''敌方墓地卡片'''
+	if username == 'admin1':
+		socket_io.emit(event="rv_you_md_card", data=json.dumps({"id":id, "md_num": md_num, "md_img": md_img}), room="admin")
+	if username == 'admin':
+		socket_io.emit(event="rv_you_md_card", data=json.dumps({"id":id, "md_num": md_num, "md_img": md_img}), room="admin1")
+
 @socket_io.on("send_src")
-def send_src(id, src, username):
+def send_src(id, src, atk, defend, username):
 	'''放置卡牌送去墓地保存的图片'''
 	if username == 'admin1':
-		socket_io.emit(event="recv_src", data=json.dumps({"id": id, "src":src}), room="admin")
+		socket_io.emit(event="recv_src", data=json.dumps({"id": id, "src":src, "atk": atk, "defend":defend}), room="admin")
 	if username == 'admin':
-		socket_io.emit(event="recv_src", data=json.dumps({"id": id, "src":src}), room="admin1")
+		socket_io.emit(event="recv_src", data=json.dumps({"id": id, "src":src, "atk": atk, "defend":defend}), room="admin1")
 
 
 @socket_io.on("card_group")
