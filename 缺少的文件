@@ -1,0 +1,62 @@
+
+缺少两个配置文件，和目录同级
+
+'''
+config.py
+import redis
+
+
+class Config():
+	'''配置文件'''
+	DEBUG = True
+
+	SECRET_KEY = "youxiwang"
+
+	# 数据库
+	SQLALCHEMY_DATABASE_URI = "mysql://root:@127.0.0.1:3306/youxiwang"
+	SQLALCHEMY_TRACK_MODIFICATIONS = True
+
+	# redis
+	REDIS_HOST = "127.0.0.1"
+	REDIS_PORT = 6379
+
+	# flask-session配置
+	SESSION_TYPE = "redis"	
+	SESSION_REDIS = redis.StrictRedis(host=REDIS_HOST, port=REDIS_PORT)
+	SESSION_USE_SIGNER = True
+	PERMANENT_SESSION_LIFETIME = 86400
+
+
+class DevelopmentConfig(Config):
+	"""开发环境"""
+	DEBUG = True
+
+
+class ProductionConfig(Config):
+	"""生产环境"""
+	pass
+
+config_map = {
+	"develop": DevelopmentConfig,
+	"product": ProductionConfig
+}
+'''
+
+
+'''
+manage.py
+from youxiwang import create_app, db, socket_io
+from flask_script import Manager
+from flask_migrate import Migrate, MigrateCommand
+
+app = create_app("develop")
+
+manager = Manager(app)
+Migrate(app, db)
+manager.add_command("db", MigrateCommand)
+
+if __name__ == "__main__":
+	socket_io.run(app=app, host="192.168.0.105", port=80)
+	# manager.run();
+
+'''
