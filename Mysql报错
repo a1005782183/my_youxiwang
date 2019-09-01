@@ -1,0 +1,4 @@
+# python3会报错ImportError: No module named 'MySQLdb'，先安装pip install PyMySQL，然后可以在初始化的时候添加一下两段代码：
+import pymysql
+pymysql.install_as_MySQLdb()
+这样就可以了
